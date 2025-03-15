@@ -7,7 +7,7 @@ A stylish and functional PowerShell profile that looks and feels almost as good 
 Execute the following command in an elevated PowerShell window to install the PowerShell profile:
 
 ```
-irm "https://github.com/arminzou/PowerShell-Profile/raw/main/setup.ps1" | iex
+irm "https://github.com/arminzou/PowerShell-Profile/raw/master/setup.ps1" | iex
 ```
 
 ## 🛠️ Fix the Missing Font
@@ -20,14 +20,16 @@ After running the script, you'll have two options for installing a font patched 
 2. Locate and install the nerd fonts.
 
 ### 2) With `oh-my-posh` (loaded automatically through the PowerShell profile script hosted on this repo):
+
 1. Run the command `oh-my-posh font install`
 2. A list of Nerd Fonts will appear like so:
-<pre>
-PS> oh-my-posh font install
+ <pre>
+ PS> oh-my-posh font install
+ 
+    Select font
 
-   Select font
+> 0xProto
 
-  > 0xProto
     3270
     Agave
     AnonymousPro
@@ -38,6 +40,7 @@ PS> oh-my-posh font install
 
     •••••••••
     ↑/k up • ↓/j down • q quit • ? more</pre>
+
 3. With the up/down arrow keys, select the font you would like to install and press <kbd>ENTER</kbd>
 4. DONE!
 
@@ -64,3 +67,4 @@ Set-PoshTheme
 After the profile is installed and active, run the `Edit-Profile` function to create a separate profile file for your current user. Make any changes and customizations in this new file named `profile.ps1`.
 
 Now, enjoy your enhanced and stylish PowerShell experience! 🚀
+```
