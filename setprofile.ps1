@@ -1,2 +1,2 @@
 $profilePath = Split-Path -Path $PROFILE
-copy .\Microsoft.PowerShell_profile.ps1 $profilePath
+Copy-Item -Path .\Microsoft.PowerShell_profile.ps1 -Destination $profilePath
