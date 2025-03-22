@@ -4,7 +4,7 @@
 # User configurable settings
 $config = @{
     # General settings
-    DefaultEditor         = $null  # Set to a specific editor to override auto-detection
+    DefaultEditor         = "code"  # Set to a specific editor to override auto-detection
     ShowLoadTime          = $true  # Show profile load time
     
     # Update settings
@@ -288,7 +288,26 @@ function Open-RecycleBin {
 
 # Quick Access to Editing the Profile
 function Edit-Profile {
-    vim $PROFILE.CurrentUserAllHosts
+    $editor = $config.DefaultEditor
+    
+    if ($null -eq $editor) {
+        # Auto-detect common editors
+        if (Get-Command code -ErrorAction SilentlyContinue) {
+            $editor = "code"
+        }
+        elseif (Get-Command notepad -ErrorAction SilentlyContinue) {
+            $editor = "notepad"
+        }
+        elseif (Get-Command vim -ErrorAction SilentlyContinue) {
+            $editor = "vim"
+        }
+        else {
+            Write-Error "No suitable editor found. Please set DefaultEditor in your profile configuration."
+            return
+        }
+    }
+    
+    & $editor $PROFILE.CurrentUserAllHosts
 }
 Set-Alias -Name ep -Value Edit-Profile
 
