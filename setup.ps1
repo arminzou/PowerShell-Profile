@@ -99,6 +99,7 @@ if (!(Test-Path -Path $profilePath)) {
 
 if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
     try {
+        Write-Host "Profile not found, creating profile..."
         # Install main PowerShell profile
         Invoke-RestMethod https://github.com/arminzou/PowerShell-Profile/raw/master/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
         Write-Host "The profile @ [$PROFILE] has been created."
@@ -127,6 +128,7 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
 }
 else {
     try {
+        Write-Host "profile found, updating profile..."
         $mainBackupPath = Join-Path $profilePath "oldprofile.ps1"
         Get-Item -Path $PROFILE | Move-Item -Destination $mainBackupPath -Force
         Invoke-RestMethod https://github.com/arminzou/PowerShell-Profile/raw/master/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
