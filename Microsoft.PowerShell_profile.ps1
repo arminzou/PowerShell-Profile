@@ -89,9 +89,6 @@ $config.ModulesToLoad | ForEach-Object {
 # Define the path to the file that stores the last execution time
 $timeFilePath = Join-Path $config.CustomScriptsPath "LastExecutionTime.txt"
 
-# Check if we're running in VS Code
-$inVSCode = $env:TERM_PROGRAM -eq 'vscode' -or $env:VSCODE -eq 'true'
-
 #opt-out of telemetry before doing anything, only if PowerShell is run as admin
 if ([bool]([System.Security.Principal.WindowsIdentity]::GetCurrent()).IsSystem) {
     [System.Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', 'true', [System.EnvironmentVariableTarget]::Machine)
@@ -100,9 +97,8 @@ if ([bool]([System.Security.Principal.WindowsIdentity]::GetCurrent()).IsSystem) 
 # Initial GitHub.com connectivity check with 1 second timeout
 $global:canConnectToGitHub = Test-Connection github.com -Count 1 -Quiet -TimeoutSeconds 1
 
-# Import Modules and External Profiles - CONDITIONALLY based on environment
-if (-not $inVSCode) {
-    # Only load Terminal-Icons outside of VS Code
+# Import Terminal-Icons Module
+if (-not (Get-Module -Name Terminal-Icons)) {
     if (-not (Get-Module -ListAvailable -Name Terminal-Icons)) {
         Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -SkipPublisherCheck
     }
