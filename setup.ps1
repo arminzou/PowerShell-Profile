@@ -98,9 +98,23 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
             New-Item -Path $profilePath -ItemType "directory" | Out-Null
         }
 
+        # Install main PowerShell profile
         Invoke-RestMethod https://github.com/arminzou/PowerShell-Profile/raw/master/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
         Write-Host "The profile @ [$PROFILE] has been created."
         Write-Host "If you want to make any personal changes or customizations, please do so at [$profilePath\Profile.ps1] as there is an updater in the installed profile which uses the hash to update the profile and will lead to loss of changes"
+
+        # Install VS Code PowerShell profile
+        $vscodeProfilePath = Join-Path $profilePath "Microsoft.VSCode_profile.ps1"
+        if (!(Test-Path -Path $vscodeProfilePath -PathType Leaf)) {
+            Copy-Item -Path $PROFILE -Destination $vscodeProfilePath
+            Write-Host "The VS Code profile @ [$vscodeProfilePath] has been created."
+        }
+        else {
+            Get-Item -Path $vscodeProfilePath | Move-Item -Destination "oldvscodeprofile.ps1" -Force
+            Copy-Item -Path $PROFILE -Destination $vscodeProfilePath
+            Write-Host "The VS Code profile @ [$vscodeProfilePath] has been updated and old profile removed."
+        }
+
         $profileSuccess = $true
         $successCount++
     }
@@ -114,6 +128,19 @@ else {
         Invoke-RestMethod https://github.com/arminzou/PowerShell-Profile/raw/master/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
         Write-Host "The profile @ [$PROFILE] has been created and old profile removed."
         Write-Host "Please back up any persistent components of your old profile to [$HOME\Documents\PowerShell\Profile.ps1] as there is an updater in the installed profile which uses the hash to update the profile and will lead to loss of changes"
+
+        # Update VS Code PowerShell profile
+        $vscodeProfilePath = Join-Path $profilePath "Microsoft.VSCode_profile.ps1"
+        if (Test-Path -Path $vscodeProfilePath -PathType Leaf) {
+            Get-Item -Path $vscodeProfilePath | Move-Item -Destination "oldvscodeprofile.ps1" -Force
+            Copy-Item -Path $PROFILE -Destination $vscodeProfilePath
+            Write-Host "The VS Code profile @ [$vscodeProfilePath] has been updated and old profile removed."
+        }
+        else {
+            Copy-Item -Path $PROFILE -Destination $vscodeProfilePath
+            Write-Host "The VS Code profile @ [$vscodeProfilePath] has been created."
+        }
+
         $profileSuccess = $true
         $successCount++
     }
