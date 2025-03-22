@@ -153,43 +153,53 @@ else {
 $ompSuccess = $false
 try {
     Write-Host "Checking for Oh My Posh installation..."
-    # Check if OMP is already installed
-    $ompInstalled = $null
-    try {
-        $ompInstalled = winget list --name "OhMyPosh" -e
-    }
-    catch {
-        # Ignore errors from winget list
-    }
-
-    # Update winget sources first
-    try {
-        Write-Host "Updating winget sources..."
-        winget source update
-    }
-    catch {
-        Write-Warning "Failed to update winget sources, continuing with installation anyway."
-    }
-
-    if ($ompInstalled -and $ompInstalled -match "Oh My Posh") {
-        Write-Host "Oh My Posh is already installed. Checking for updates..."
-        winget upgrade -e --id JanDeDobbeleer.OhMyPosh --accept-source-agreements
-    }
-    else {
-        Write-Host "Installing Oh My Posh..."
-        winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
-    }
     
-    # Verify installation
-    $ompVerify = winget list --name "OhMyPosh" -e
-    if ($ompVerify -match "Oh My Posh") {
-        Write-Host "Oh My Posh installed/updated successfully."
+    # Check if oh-my-posh command exists and get its version
+    $ompCommand = Get-Command oh-my-posh -ErrorAction SilentlyContinue
+    if ($ompCommand) {
+        $currentVersion = (oh-my-posh version).Trim()
+        Write-Host "Oh My Posh version $currentVersion is installed."
+        
+        # Check for updates if installed via winget
+        try {
+            $wingetCheck = winget list --id JanDeDobbeleer.OhMyPosh -e
+            if ($wingetCheck -match "Oh My Posh") {
+                Write-Host "Checking for Oh My Posh updates..."
+                winget upgrade -e --id JanDeDobbeleer.OhMyPosh --accept-source-agreements
+            }
+        }
+        catch {
+            Write-Host "Oh My Posh was installed via alternative method, skipping winget update check."
+        }
+        
         $ompSuccess = $true
         $successCount++
     }
+    else {
+        Write-Host "Oh My Posh not found. Installing via winget..."
+        
+        # Try to install via winget
+        try {
+            winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
+            
+            # Verify installation
+            if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
+                $version = (oh-my-posh version).Trim()
+                Write-Host "Oh My Posh version $version installed successfully."
+                $ompSuccess = $true
+                $successCount++
+            }
+            else {
+                throw "Oh My Posh installation verification failed."
+            }
+        }
+        catch {
+            Write-Error "Failed to install Oh My Posh via winget. Error: $_"
+        }
+    }
 }
 catch {
-    Write-Error "Failed to install Oh My Posh. Error: $_"
+    Write-Error "Failed to process Oh My Posh installation. Error: $_"
 }
 
 # Font Install
