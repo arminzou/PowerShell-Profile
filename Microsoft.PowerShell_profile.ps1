@@ -188,17 +188,31 @@ Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock $scriptblock
 
 # Get theme from profile.ps1 or use a default theme
 function Get-Theme {
+    # First check if theme is already configured in profile
     if (Test-Path -Path $PROFILE.CurrentUserAllHosts -PathType leaf) {
         $existingTheme = Select-String -Raw -Path $PROFILE.CurrentUserAllHosts -Pattern "oh-my-posh init pwsh --config"
         if ($null -ne $existingTheme) {
+            Write-Host "Using existing theme configuration from profile" -ForegroundColor Green
             Invoke-Expression $existingTheme
             return
         }
-        oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/$($config.DefaultTheme).omp.json | Invoke-Expression
     }
-    else {
-        oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/$($config.DefaultTheme).omp.json | Invoke-Expression
+
+    # Try to fetch custom theme from GitHub repository
+    $customThemeUrl = "https://raw.githubusercontent.com/arminzou/PowerShell-Profile/master/CustomThemes/$($config.DefaultTheme).omp.json"
+    try {
+        $response = Invoke-WebRequest -Uri $customThemeUrl -UseBasicParsing
+        if ($response.StatusCode -eq 200) {
+            oh-my-posh init pwsh --config $customThemeUrl | Invoke-Expression
+            return
+        }
     }
+    catch {
+        Write-Warning "Custom theme not found in repository. Falling back to default theme..."
+    }
+
+    # Fallback to default theme from oh-my-posh
+    oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/$($config.DefaultTheme).omp.json | Invoke-Expression
 }
 
 ## Final Line to set prompt
