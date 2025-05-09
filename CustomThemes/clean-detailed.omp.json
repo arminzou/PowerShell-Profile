@@ -112,7 +112,7 @@
 					"style": "plain",
 					"template": "{{ if .Full }} | \ue235 {{ .Full }}{{ if .Env.VIRTUAL_ENV }} ({{ base .Env.VIRTUAL_ENV }}){{ end }}{{ end }}",
 					"properties": {
-						"display_mode": "files",
+						"display_mode": "environment",
 						"fetch_version": true,
 						"fetch_virtual_env": true
 					}
